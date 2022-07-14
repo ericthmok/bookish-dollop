@@ -16,5 +16,12 @@
   "bugs": {
     "url": "https://github.com/ericthmok/bookish-dollop/issues"
   },
-  "homepage": "https://github.com/ericthmok/bookish-dollop#readme"
+  "homepage": "https://github.com/ericthmok/bookish-dollop#readme",
+  "dependencies": {
+    "express": "^4.18.1",
+    "express-handlebars": "^6.0.6",
+    "express-session": "^1.17.3",
+    "mysql2": "^2.3.3",
+    "sequelize": "^6.21.3"
+  }
 }
