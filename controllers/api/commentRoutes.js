@@ -1,48 +1,50 @@
 const router = require('express').Router();
 const {Comment} = require('../../models');
-const auth = require('../../utils/auth');
 
-router.get('/', (req, res)=>{
-    Comment.findAll({})
-    .then(dbCommentData => res.json(dbCommentData))
-    .catch(err =>{
-        console.log(err);
-        res.status(500).json(err);
+router.get('/', async(req,res)=>{
+    const commentData = await Comment.findAll().catch((err)=>{
+        res.json(err);
     });
+    const comments = commentData.map((post)=>post.get({plain: true}));
+    res.render('homepage', {comments});
 });
 
-router.post('/', auth, (req, res)=>{
-    if(req.session){
-        Comment.create({
-            comment_text: req.body.comment_text,
-            post_id: req.body.post_id,
-            user_id: req.session.user_id,
-        })
-        .then(dbCommnetData => res.json(dbCommentData))
-        .catch(err =>{
-            console.log(err);
-            res.status(400).json(err);
+router.post('/', async(req,res)=>{
+    try{
+        const newCommentData = await Comment.create({
+            title: req.body.title,
+            content: req.body.content,
+            user_id: req.session.userId,
         });
+        res.status(200).json('Created')
+    } catch(err){
+        console.log(err);
+        res.status(400).json(err);
     }
 });
 
-router.delete('/:id', auth, (req, res)=>{
-    Comment.destroy({
-        where: {
-            id: req.params.id
-        }
-    })
-    .then(dbCommentData => {
-        if(!dbCommentData){
-            res.status(404).json({message: 'Comment not Found'});
-            return;
-        }
-        res.json(dbCommentData);
-    })
-    .catch(err =>{
+router.put('/:id', async(req,res)=>{
+    try{
+        const editCommentData = await Comment.update({
+            title: req.body.title,
+            content: req.body.content,
+            user_id: req.session.userId,
+        });
+        res.status(200).json('Updated')
+    } catch (err){
         console.log(err);
-        res.status(500).json(err);
-    });
+        res.status(400).json(err);
+    }
+});
+
+router.delete('/:id', async(req,res)=>{
+    try{
+        const deleteComment = await Post.destroy({where:{id: req.params.id}})
+        res.status(200).json(err);
+    } catch (err){
+        console.log(err);
+        res.status(400).json(err);
+    }
 });
 
 module.exports = router;
